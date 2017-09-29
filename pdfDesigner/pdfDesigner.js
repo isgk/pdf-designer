@@ -75,8 +75,72 @@ angular.module('myApp.pdfDesigner', ['ngRoute'])
 
     dragulaService.options($scope, designHelpers.bagName, dragulaConfig);
 
-    $scope.modifyLayout = function () { 
-      console.log('Clicked');
+    $scope.resizeColumn = {
+      oldX : 0,
+      oldY : 0,
+      currentX: 0,
+      currentY: 0,
+
+      dragStart : function (event) {
+        var elem = event.toElement,
+        sibling = designHelpers.getSibilings(elem);
+        // get first element in the array
+        sibling = sibling[0];
+
+        $scope.resizeColumn.oldX = event.clientX;
+        $scope.resizeColumn.oldY = event.clientY;
+
+        console.log('Drag started----');
+        // console.log($scope.resizeColumn);
+        // console.log(elem);
+        // console.log(sibling);
+      },
+
+      dragging : function (event) {
+        var elem = event.toElement,
+        sibling = designHelpers.getSibilings(elem);
+        
+
+
+        if (elem.tagName == "DIV") {
+        }
+      },
+
+      dragOver : function (event) {
+        var elem = event.toElement,
+        sibling = designHelpers.getSibilings(elem);
+        sibling = sibling[0];
+        
+        if (elem.tagName == "DIV") {
+          var elemWidth, siblingWidth, baseStyle;
+          
+                  console.log('Drag over ----');
+                  
+                  $scope.resizeColumn.currentX = event.clientX;
+                  $scope.resizeColumn.currentY = event.clientY;
+          
+                  console.log($scope.resizeColumn.getDiffX());
+                  console.log(elem);
+                  if ($scope.resizeColumn.getDiffX() > 0) {
+                      elemWidth = 50 - $scope.resizeColumn.getDiffX();
+                      siblingWidth = 50 + $scope.resizeColumn.getDiffX();
+                  } else {
+                    elemWidth = 50 + $scope.resizeColumn.getDiffX();
+                    siblingWidth = 50 - $scope.resizeColumn.getDiffX();
+                  }
+                  baseStyle = 'min-height: 10vh;\
+                    border-left: 1px solid #aaa;\
+                    border-right: 1px solid #aaa;\
+                  ';
+                  elem.style = baseStyle + 'width :'+ elemWidth + '%;';
+                  sibling.style = baseStyle + 'width :'+ siblingWidth + '%;';          
+        }
+
+      },
+      
+      getDiffX: function () {
+        return ($scope.resizeColumn.currentX - $scope.resizeColumn.oldX)/10;
+      }
     };
 
     $scope.menuOptions = [
@@ -90,8 +154,12 @@ angular.module('myApp.pdfDesigner', ['ngRoute'])
               
               var div = document.createElement('div');
               div.className = 'row';
-              var childDiv = designHelpers.buildHtmlTag('div', newContainerIds[0], 'newContainer col-md-6 ng-isolate-scope', 'dragula', '"firstBag"', "border: 1px dashed #aaa; min-height: 10vh;");
+              div.style = 'border: 1px dashed #aaa';
+              div.setAttribute('ondragstart', 'angular.element(this).scope().resizeColumn.dragStart(event)');
+              div.setAttribute('ondragover', 'angular.element(this).scope().resizeColumn.dragOver(event)');
               
+
+              var childDiv = designHelpers.buildHtmlTag('div', newContainerIds[0], 'newContainer col-md-6 ng-isolate-scope', 'dragula', '"firstBag"', "border-right: 1px dashed #aaa; min-height: 10vh;");
               if (elem.id == 'scratch') {
                 var elemParent = elem;
                 for (var index = 0; index < elem.childNodes.length; index++) {
@@ -117,7 +185,7 @@ angular.module('myApp.pdfDesigner', ['ngRoute'])
                 
                   div.appendChild(childDiv);
                   div.innerHTML += '\
-                    <div id='+ newContainerIds[1] + ' class="newContainer col-md-6 ng-isolate-scope" dragula=\'"firstBag"\' style="border: 1px dashed #aaa; min-height: 10vh;"></div>\
+                    <div ng-click="" id='+ newContainerIds[1] + ' class="newContainer col-md-6 ng-isolate-scope" dragula=\'"firstBag"\' style="border-left: 1px dashed #aaa; min-height: 10vh;" ></div>\
                   ';
                   elemParent.appendChild(div);
                   designHelpers.pushNewContainers();
