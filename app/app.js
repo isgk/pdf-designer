@@ -4,7 +4,7 @@
 angular.module('myApp', [
   'ui.bootstrap',
   'ui.bootstrap.contextMenu',
-  'ng-split',
+  'angularResizable',
   'ngRoute',
   'myApp.view1',
   'myApp.view2',
